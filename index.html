@@ -3,6 +3,258 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora de Consumo de Tecido</title>
+  <style>
+    * { 
+      box-sizing: border-box; margin: 0; padding: 0; 
+    }
+
+    body {
+      background: white;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+    }
+
+    .calculator {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .calculator-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .calculator-header img {
+      height: 100px;
+    }
+
+    .section {
+      background: #e8f9f4;
+      border: 1px solid #33ad8b;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    .radios {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .radios label {
+      flex: 1;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #333;
+      cursor: pointer;
+    }
+
+    .radios input[type="radio"] {
+      margin-bottom: 6px;
+    }
+
+    .cortinasImg {
+      width: 100%;
+      border-radius: 4px;
+      display: block;
+    }
+
+    .fields {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .fields label {
+      font-size: 0.9rem;
+      color: #333;
+      margin-top: 8px;
+    }
+
+    .fields input,
+    .fields select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+
+    #btnCalcular {
+      background: #33ad8b;
+      color: #fff;
+      border: none;
+      padding: 14px;
+      width: 100%;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 16px;
+    }
+
+    #btnCalcular:hover {
+      background: #3fcaa2;
+    }
+
+    .resultado {
+      text-align: center;
+    }
+
+    .resultado h2 {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .resultado p {
+      font-size: 1rem;
+      color: #333;
+      margin: 4px 0;
+    }
+
+    .resultado strong {
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="calculator-header">
+      <img src="https://i.postimg.cc/g0g0f21s/download-1.png" alt="Tecidos e Cortinas">
+    </div>
+    <form id="formCalc" onsubmit="return false;">
+      <div class="section">
+        <h2>1. Grau de franzimento</h2>
+        <div class="radios">
+          <label>
+            <input type="radio" name="franzimento" value="2" checked>
+            Pouco Franzida
+          </label>
+          <label>
+            <input type="radio" name="franzimento" value="2.5">
+            Franzida
+          </label>
+          <label>
+            <input type="radio" name="franzimento" value="3">
+            Muito Franzida
+          </label>
+        </div>
+        <img class="cortinasImg" src="https://i.postimg.cc/j5w4220q/Cortinas.png" alt="">
+      </div>
+      <div class="section">
+        <h2>2. Dimensões</h2>
+        <div class="fields">
+          <label for="largura">Largura do Local de Instalação (m):</label>
+          <input type="number" step="0.01" id="largura" required placeholder="Ex: 4.30">
+
+          <label for="altura">Altura do Local de Instalação (m):</label>
+          <input type="number" step="0.01" id="altura" required placeholder="Ex: 6.00">
+
+          <label for="largura-tecido">Largura do Tecido (m):</label>
+          <select id="largura-tecido">
+            <option value="3.00">3,00</option>
+            <option value="2.90">2,90</option>
+            <option value="2.80">2,80</option>
+            <option value="1.60">1,60</option>
+            <option value="1.50">1,50</option>
+            <option value="1.40">1,40</option>
+          </select>
+        </div>
+      </div>
+      <button id="btnCalcular">CALCULAR</button>
+    </form>
+    <div class="resultado">
+      <h2>Resultado</h2>
+      <p>Consumo de Tecido: <strong><span id="consumo">0,00</span> m</strong></p>
+      <p><span id="emendas">Nenhuma emenda vertical</span></p>
+    </div>
+  </div>
+  <script>
+    function getFator() {
+      return parseFloat(document.querySelector('input[name="franzimento"]:checked').value);
+    }
+    function calcular() {
+      const alt = parseFloat(document.getElementById('altura').value);
+      const lar = parseFloat(document.getElementById('largura').value);
+      const largTecido = parseFloat(document.getElementById('largura-tecido').value);
+      const margem = 0.50;
+      const fator = getFator();
+
+      let consumo, emendas;
+      if (alt <= 2.50) {
+        consumo = lar * fator;
+        emendas = 0;
+      } else {
+        const faixas = (lar * fator) / largTecido;
+        const alturas = Math.ceil(faixas);
+        emendas = Math.max(0, alturas - 1);
+        consumo = alturas * (alt + margem);
+      }
+
+      document.getElementById('consumo').textContent =
+        consumo.toFixed(2).replace('.', ',');
+      document.getElementById('emendas').textContent =
+        emendas === 0
+          ? 'Nenhuma emenda vertical'
+          : emendas === 1
+            ? '1 emenda vertical'
+            : emendas + ' emendas verticais';
+    }
+    document.getElementById('btnCalcular').addEventListener('click', calcular);
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Calculadora de Tecido para Cortinas</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
@@ -26,15 +278,12 @@
   <div class="calculator">
     <h1>Calculadora de Consumo de Tecido</h1>
     <form id="formCalc" onsubmit="return false;">
-      <!-- 1. Grau de franzimento -->
       <fieldset>
         <legend>1. Grau de franzimento</legend>
         <label><input type="radio" name="franzimento" value="2" checked>Pouco franzida (fator 2×)</label>
         <label><input type="radio" name="franzimento" value="2.5">Franzida (fator 2,5×)</label>
         <label><input type="radio" name="franzimento" value="3">Muito franzida (fator 3×)</label>
       </fieldset>
-
-      <!-- 2. Dimensões da cortina -->
       <fieldset>
         <legend>2. Dimensões da cortina</legend>
         <label for="largura">Largura do local de instalação (m):</label>
@@ -42,8 +291,6 @@
         <label for="altura">Altura do local de instalação (m):</label>
         <input type="number" step="0.01" id="altura" class="inputDim" required placeholder="Ex: 2.80">
       </fieldset>
-
-      <!-- 3. Tecido e acabamento -->
       <fieldset>
         <legend>3. Tecido e acabamento</legend>
         <label for="largura-tecido">Largura do tecido (m):</label>
@@ -59,8 +306,6 @@
 
       <button id="btnCalcular">Calcular</button>
     </form>
-
-    <!-- Resultado -->
     <div class="resultado">
       <h2>Resultado</h2>
       <p>Consumo total de tecido: <strong><span id="consumo">0,00</span> m</strong></p>
@@ -69,12 +314,10 @@
   </div>
 
   <script>
-    // Lê o fator de franzimento selecionado
     function getFator() {
       return parseFloat(document.querySelector('input[name="franzimento"]:checked').value);
     }
 
-    // Calcula e exibe consumo e emendas seguindo o PDF
     function calcular() {
       const alt = parseFloat(document.getElementById('altura').value);
       const lar = parseFloat(document.getElementById('largura').value);
@@ -96,7 +339,6 @@
         consumo = alturas * (alt + margem);
       }
 
-      // formata e exibe
       document.getElementById('consumo').textContent =
         consumo.toFixed(2).replace('.', ',');
       document.getElementById('emendas').textContent =
@@ -112,3 +354,4 @@
   </script>
 </body>
 </html>
+ -->
