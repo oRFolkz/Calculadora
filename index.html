@@ -55,8 +55,6 @@
           <option value="1.50">1,50</option>
           <option value="1.40">1,40</option>
         </select>
-        <label for="margem">Margem de acabamento por barra (m):</label>
-        <input type="number" step="0.01" id="margem" class="inputDim" value="0.50" required>
       </fieldset>
 
       <button id="btnCalcular">Calcular</button>
@@ -81,7 +79,7 @@
       const alt = parseFloat(document.getElementById('altura').value);
       const lar = parseFloat(document.getElementById('largura').value);
       const largTecido = parseFloat(document.getElementById('largura-tecido').value);
-      const margem = parseFloat(document.getElementById('margem').value);
+      const margem = 0.50
       const fator = getFator();
 
       let consumo, emendas;
